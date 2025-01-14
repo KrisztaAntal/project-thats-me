@@ -1,19 +1,28 @@
 package org.coathangerstudios.backend.model.entity;
 
 import jakarta.persistence.*;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Getter
 public class Member {
+
     @Id
     @GeneratedValue
     private Long id;
-    private UUID publicId;
+    private UUID memberId;
     private LocalDate dateOfRegistry;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "members_roles",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<MemberRole> roles;
 
     private String username;
     private String firstName;
