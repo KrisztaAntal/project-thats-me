@@ -1,0 +1,21 @@
+package org.coathangerstudios.backend.model.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+
+import java.util.Set;
+
+@Entity
+@Getter
+public class MemberRole {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+    @Enumerated(EnumType.STRING)
+    @Column(unique = true)
+    private String role;
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    private Set<Member> members;
+
+}
