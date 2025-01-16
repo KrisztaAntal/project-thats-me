@@ -32,10 +32,6 @@ function SignupForm() {
     navigate("/signin");
   }
 
-  function handleShowPassword() {
-    setShowPassword((prev) => !prev);
-  }
-
   return (
     <form className="flex flex-col gap-3 items-center" onSubmit={handleCreateMember}>
       <CustomFormField
@@ -69,7 +65,7 @@ function SignupForm() {
         inputValue={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="J0hnDoe@2025"
-        onShowPasswordClick={handleShowPassword}>
+        onShowPasswordClick={() => setShowPassword((prev) => !prev)}>
       </CustomFormField>
       <CustomFormField
         inputId="email"
@@ -86,7 +82,7 @@ function SignupForm() {
         inputValue={birthDate}
         onChange={(e) => setBirthDate(e.target.value)}>
       </CustomFormField>
-      <button>Continue</button>
+      <button className="bg-[#76ABAE] p-2">Continue</button>
     </form>
   )
 }
