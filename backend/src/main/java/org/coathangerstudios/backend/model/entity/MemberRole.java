@@ -10,11 +10,11 @@ import java.util.Set;
 public class MemberRole {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(unique = true)
-    private String role;
+    private Role role;
     @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     private Set<Member> members;
 

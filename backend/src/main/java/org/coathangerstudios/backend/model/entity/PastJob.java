@@ -2,8 +2,10 @@ package org.coathangerstudios.backend.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -13,8 +15,9 @@ import java.util.UUID;
 public class PastJob {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @UuidGenerator
     private UUID jobId;
     private String companyName;
     private String jobTitle;
@@ -22,4 +25,15 @@ public class PastJob {
     private LocalDate endDate;
     private String description;
 
+    public PastJob(String companyName, String jobTitle, LocalDate startDate, LocalDate endDate, String description) {
+        this.companyName = companyName;
+        this.jobTitle = jobTitle;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.description = description;
+    }
+
+    public PastJob() {
+
+    }
 }
