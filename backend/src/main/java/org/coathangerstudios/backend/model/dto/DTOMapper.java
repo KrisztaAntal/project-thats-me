@@ -9,7 +9,7 @@ public class DTOMapper {
 
     public static MemberDto toMemberDto(Member member){
         return new MemberDto(
-                member.getMemberId(),
+                member.getMemberPublicId(),
                 member.getDateOfRegistry(),
                 toMemberRoleDtoSet(member.getRoles()),
                 member.getUsername(),
@@ -20,7 +20,7 @@ public class DTOMapper {
                 member.getBiography(),
                 toMonogramDto(member.getMonogram()),
                 member.getAvatar(),
-                member.getBannerPic(),
+                member.getBannerImage(),
                 toExpertiseDtoSet(member.getExpertises()),
                 toPastJobDtoSet(member.getPastJobs()),
                 toProjectOfMemberDtoSet(member.getProjectsOfMember())
@@ -29,7 +29,7 @@ public class DTOMapper {
 
     public static MonogramDto toMonogramDto(Monogram monogram) {
         return new MonogramDto(
-                monogram.getMonogramId(),
+                monogram.getMonogramPublicId(),
                 monogram.getCharacters(),
                 monogram.getColorCode()
         );
@@ -41,7 +41,7 @@ public class DTOMapper {
 
     public static ExpertiseDto toExpertiseDto(Expertise expertise) {
         return new ExpertiseDto(
-                expertise.getExpertiseId(),
+                expertise.getExpertisePublicId(),
                 expertise.getName()
         );
     }
@@ -52,7 +52,7 @@ public class DTOMapper {
 
     public static PastJobDto pastJobDto(PastJob pastJob) {
         return new PastJobDto(
-                pastJob.getJobId(),
+                pastJob.getJobPublicId(),
                 pastJob.getCompanyName(),
                 pastJob.getJobTitle(),
                 pastJob.getStartDate(),
@@ -67,7 +67,7 @@ public class DTOMapper {
 
     public static ProjectOfMemberDto toProjectOfMemberDto(ProjectOfMember projectOfMember) {
         return new ProjectOfMemberDto(
-                projectOfMember.getProjectId(),
+                projectOfMember.getProjectPublicId(),
                 projectOfMember.getProjectTitle(),
                 projectOfMember.getProjectDescription()
         );
@@ -78,7 +78,7 @@ public class DTOMapper {
     }
 
     public static MemberRoleDto toMemberRoleDto(MemberRole memberRole) {
-        return new MemberRoleDto(memberRole.getRole());
+        return new MemberRoleDto(memberRole.getRole().name());
     }
 
 
