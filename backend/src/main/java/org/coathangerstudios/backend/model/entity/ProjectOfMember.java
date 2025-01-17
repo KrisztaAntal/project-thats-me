@@ -15,9 +15,9 @@ public class ProjectOfMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long projectId;
     @UuidGenerator
-    private UUID projectId;
+    private UUID projectPublicId;
     private String projectTitle;
     private String projectDescription;
 

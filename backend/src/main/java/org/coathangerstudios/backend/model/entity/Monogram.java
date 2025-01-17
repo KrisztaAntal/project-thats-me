@@ -17,9 +17,9 @@ public class Monogram {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long monogramId;
     @UuidGenerator
-    private UUID monogramId;
+    private UUID monogramPublicId;
     private String characters;
     private String colorCode;
 

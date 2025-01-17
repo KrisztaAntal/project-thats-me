@@ -15,9 +15,9 @@ public class Expertise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long expertiseId;
     @UuidGenerator
-    private UUID expertiseId;
+    private UUID expertisePublicId;
     private String name;
 
     public Expertise(String name) {

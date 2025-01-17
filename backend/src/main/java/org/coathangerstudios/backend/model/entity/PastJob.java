@@ -16,9 +16,9 @@ public class PastJob {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long jobId;
     @UuidGenerator
-    private UUID jobId;
+    private UUID jobPublicId;
     private String companyName;
     private String jobTitle;
     private LocalDate startDate;
