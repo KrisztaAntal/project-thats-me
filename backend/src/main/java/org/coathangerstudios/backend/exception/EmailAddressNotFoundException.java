@@ -1,4 +1,4 @@
-package org.coathangerstudios.backend.security;
+package org.coathangerstudios.backend.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
