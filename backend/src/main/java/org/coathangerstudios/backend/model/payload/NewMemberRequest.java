@@ -6,15 +6,21 @@ import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
 
 import lombok.Data;
+import org.coathangerstudios.backend.security.customValidator.ageLimit.AgeLimit;
+
+import java.time.LocalDate;
 
 
 @Data
 public class NewMemberRequest {
     @NotBlank(message = "Username cannot be blank")
+    @Pattern(regexp = "^[\\p{L}0-9_\\-.+]+$", message = "Username can only contain letters, digits, underscores (_), hyphens (-), periods (.), and plus signs (+).")
     private String username;
-    @NotBlank(message = "First name cannot be blank")
+    @NotBlank(message = "Firstname cannot be blank")
+    @Pattern(regexp = "^[\\p{L}0-9 _\\-.+]+$", message = "Firstname can only contain letters, digits, spaces, underscores (_), hyphens (-), periods (.), and plus signs (+).")
     private String firstName;
-    @NotBlank(message = "Last name cannot be blank")
+    @NotBlank(message = "Lastname cannot be blank")
+    @Pattern(regexp = "^[\\p{L}0-9 _\\-.+]+$", message = "Lastname can only contain letters, digits, spaces, underscores (_), hyphens (-), periods (.), and plus signs (+).")
     private String lastName;
     @NotBlank(message = "Password cannot be blank")
     @Size(message = "Password must be 8-20 characters long", min = 8, max = 20)
@@ -22,9 +28,6 @@ public class NewMemberRequest {
     @Email(message = "Email address must be a valid email format")
     private String email;
     @NotBlank
-    @Pattern(
-            regexp = "^\\d{4}-\\d{2}-\\d{2}$",
-            message = "Birthdate must be in the format yyyy-MM-dd"
-    )
-    private String birthdate;
+    @AgeLimit
+    private LocalDate birthdate;
 }
