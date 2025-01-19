@@ -3,7 +3,7 @@ package org.coathangerstudios.backend.security.service;
 import org.coathangerstudios.backend.model.entity.Member;
 import org.coathangerstudios.backend.model.entity.MemberRole;
 import org.coathangerstudios.backend.repository.MemberRepository;
-import org.coathangerstudios.backend.security.EmailAddressNotFoundException;
+import org.coathangerstudios.backend.exception.EmailAddressNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

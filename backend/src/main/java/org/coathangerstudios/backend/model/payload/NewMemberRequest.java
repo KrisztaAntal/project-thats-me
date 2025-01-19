@@ -1,10 +1,9 @@
 package org.coathangerstudios.backend.model.payload;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.NotBlank;
-
 import lombok.Data;
 import org.coathangerstudios.backend.security.customValidator.ageLimit.AgeLimit;
 
@@ -27,7 +26,6 @@ public class NewMemberRequest {
     private String password;
     @Email(message = "Email address must be a valid email format")
     private String email;
-    @NotBlank
     @AgeLimit
     private LocalDate birthdate;
 }

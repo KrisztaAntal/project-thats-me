@@ -49,7 +49,7 @@ public class Member {
     @ManyToMany
     private Set<ProjectOfMember> projectsOfMember;
 
-    public Member(String username, String firstName, String lastName, String password, String email, LocalDate birthDate, String biography, String avatar, String bannerImage) {
+    public Member(String username, String firstName, String lastName, String password, String email, LocalDate birthDate, String biography, Monogram monogram, String avatar, String bannerImage) {
         this.dateOfRegistry = LocalDate.now();
         this.roles = new HashSet<>();
         this.username = username;
@@ -59,7 +59,7 @@ public class Member {
         this.email = email;
         this.birthDate = birthDate;
         this.biography = biography;
-        this.monogram = new Monogram(firstName.substring(0,1).concat(lastName.substring(0,1)), "#000000");
+        this.monogram = monogram;
         this.avatar = avatar;
         this.bannerImage = bannerImage;
         this.expertises = new HashSet<>();
@@ -69,4 +69,10 @@ public class Member {
 
     public Member() {
     }
+
+    public void addRole(MemberRole role) {
+        roles.add(role);
+    }
 }
+
+
