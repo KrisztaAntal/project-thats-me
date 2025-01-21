@@ -20,7 +20,9 @@ function SignupForm() {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [birthDate, setBirthDate] = useState<string>("");
   const navigate = useNavigate();
@@ -66,6 +68,15 @@ function SignupForm() {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="J0hnDoe@2025"
         onShowPasswordClick={() => setShowPassword((prev) => !prev)}>
+      </CustomFormField>
+      <CustomFormField
+        inputId="confirmPassword"
+        labelValue="Confirm Password"
+        inputType={showConfirmPassword ? "text" : "password"}
+        inputValue={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="J0hnDoe@2025"
+        onShowPasswordClick={() => setShowConfirmPassword((prev) => !prev)}>
       </CustomFormField>
       <CustomFormField
         inputId="email"
