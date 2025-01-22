@@ -2,6 +2,8 @@ import { FormEvent, useState } from "react";
 import CustomFormField from "./CustomFormField";
 import { NewMember } from "../../Types/MemberTypes";
 import { useNavigate } from "react-router-dom";
+import { newMemberSchema } from "../../Schemas/MemberSchemas";
+import { z } from "zod";
 
 async function createNewMember(newMember: NewMember) {
   const response = await fetch('/api/signup', {
@@ -29,9 +31,19 @@ function SignupForm() {
 
   async function handleCreateMember(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const newMember = { username, firstName, lastName, password, email, birthDate };
-    await createNewMember(newMember);
-    navigate("/signin");
+    const newMember = { username, firstName, lastName, password, confirmPassword, email, birthDate };
+
+    const result = newMemberSchema.safeParse(newMember);
+    if (result.success) {
+      await createNewMember(newMember);
+      navigate("/signin");
+    } else {
+      if (result.error instanceof z.ZodError) {
+        alert(result.error.errors.map((err) => err.message).join("\n"));
+      } else {
+        alert("Unexpected error occurred.");
+      }
+    }
   }
 
   return (

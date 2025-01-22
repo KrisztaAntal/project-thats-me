@@ -1,4 +1,6 @@
 import { ChangeEvent } from "react";
+import { z } from "zod";
+import { newMemberSchema } from "../Schemas/MemberSchemas";
 
 type InputId = "username" | "firstname" | "lastname" | "password" | "confirmPassword" | "email" | "birthdate";
 type labelValue = "Username" | "First Name" | "Last Name" | "Password" | "Confirm Password" | "Email" | "Birth Date";
@@ -15,11 +17,4 @@ export interface CustomFormFieldProps {
   onShowPasswordClick?: () => void;
 }
 
-export interface NewMember {
-  username: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  email: string;
-  birthDate: string;
-}
+export type NewMember = z.infer<typeof newMemberSchema>;
