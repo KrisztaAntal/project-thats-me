@@ -38,6 +38,7 @@ public class Member {
     private LocalDate birthDate;
     private String biography;
     @OneToOne
+    @JoinColumn(name="monogram_Id", referencedColumnName = "monogramId")
     private Monogram monogram;
     private String avatar;
     private String bannerImage;

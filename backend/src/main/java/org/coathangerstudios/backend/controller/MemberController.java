@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 
 @RequestMapping("/api")
 @RestController
@@ -23,7 +25,7 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public MemberDto signup(@Valid @RequestBody NewMemberRequest newMemberRequest) {
+    public UUID signup(@Valid @RequestBody NewMemberRequest newMemberRequest) {
          return memberService.signUp(newMemberRequest);
     }
 

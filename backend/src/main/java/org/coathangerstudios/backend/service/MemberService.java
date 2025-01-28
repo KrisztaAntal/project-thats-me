@@ -1,9 +1,9 @@
 package org.coathangerstudios.backend.service;
 
-import org.coathangerstudios.backend.exception.EmailAddressAlreadyInUseException;
-import org.coathangerstudios.backend.exception.UsernameIsAlreadyInUseException;
-import org.coathangerstudios.backend.model.dto.DTOMapper;
-import org.coathangerstudios.backend.model.dto.MemberDto;
+import jakarta.transaction.Transactional;
+import org.coathangerstudios.backend.exception.DatabaseSaveException;
+import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
+import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
 import org.coathangerstudios.backend.model.entity.Member;
 import org.coathangerstudios.backend.model.entity.MemberRole;
 import org.coathangerstudios.backend.model.entity.Monogram;
@@ -13,10 +13,11 @@ import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
 import org.coathangerstudios.backend.repository.MemberRepository;
 import org.coathangerstudios.backend.repository.MonogramRepository;
-import org.coathangerstudios.backend.repository.RoleRepository;
+import org.coathangerstudios.backend.repository.MemberRoleRepository;
 import org.coathangerstudios.backend.security.jwt.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,84 +39,68 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
-    private final RoleRepository roleRepository;
+    private final MemberRoleRepository memberRoleRepository;
     private final MonogramRepository monogramRepository;
+    private final DTOMapperService dtoMapperService;
 
 
-    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, RoleRepository roleRepository, MonogramRepository monogramRepository) {
+    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleRepository memberRoleRepository, MonogramRepository monogramRepository, DTOMapperService dtoMapperService) {
         this.authenticationManager = authenticationManager;
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
-        this.roleRepository = roleRepository;
+        this.memberRoleRepository = memberRoleRepository;
         this.monogramRepository = monogramRepository;
+        this.dtoMapperService = dtoMapperService;
     }
 
-
-    public MemberDto signUp(NewMemberRequest newMemberRequest) {
-        try {
-            if (!alreadyInDB(newMemberRequest.getUsername(), newMemberRequest.getEmail())) {
-                saveNewMember(newMemberRequest);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-        Member savedMember = findMemberByUsername(newMemberRequest.getUsername());
-
-        return DTOMapper.toMemberDto(savedMember);
+    @Transactional
+    public UUID signUp(NewMemberRequest newMemberRequest) {
+        validateMemberUniqueness(newMemberRequest.getUsername(), newMemberRequest.getEmail());
+        saveNewMember(newMemberRequest);
+        Member savedMember = memberRepository.findUserByUsername(newMemberRequest.getUsername()).orElseThrow(() -> new IllegalStateException("Member was not found after saving. This should not happen."));
+        return savedMember.getMemberPublicId();
     }
 
     public JwtResponse login(MemberLoginRequest memberLoginRequest) {
         String usernameOrEmail = memberLoginRequest.getUsernameOrEmail();
         String password = memberLoginRequest.getPassword();
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(usernameOrEmail, password));
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernameOrEmail, password));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtUtils.generateJwtToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtUtils.generateJwtToken(authentication);
 
-        User userDetails = (User) authentication.getPrincipal();
-        Set<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
+            User userDetails = (User) authentication.getPrincipal();
+            Set<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
 
-        return new JwtResponse(token, userDetails.getUsername(), roles);
+            return new JwtResponse(token, userDetails.getUsername(), roles);
+        } catch (Exception e) {
+            throw new MemberNotFoundWithGivenCredentialsException();
+        }
     }
 
-    private Member findMemberByUsername(String username) {
-        return memberRepository.findUserByUsername(username).orElseThrow();
-    }
-
-    private boolean alreadyInDB(String username, String email) {
-        if (memberRepository.findUserByUsername(username).isPresent()) {
-            throw new UsernameIsAlreadyInUseException("Username is already in use.");
+    private void validateMemberUniqueness(String username, String email) {
+        if (memberRepository.existsByUsernameOrEmail(username, email)) {
+            throw new UsernameOrEmailAddressAlreadyInUseException();
         }
-        if (memberRepository.findUserByEmail(email).isPresent()) {
-            throw new EmailAddressAlreadyInUseException("Email is already in use.");
-        }
-        return false;
     }
 
     private void saveNewMember(NewMemberRequest newMemberRequest) {
-        Monogram newMemberMonogram = new Monogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)), "#000000");
-        monogramRepository.save(newMemberMonogram);
+        try {
+            Monogram monogramOfNewMember = new Monogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)), "#000000");
+            monogramRepository.save(monogramOfNewMember);
+            Member newMember = new Member(newMemberRequest.getUsername(), newMemberRequest.getFirstName(), newMemberRequest.getLastName(), passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthdate(), null, monogramOfNewMember, null, null);
+            addUserRoleToMember(newMember);
+            memberRepository.save(newMember);
+        } catch (DataAccessException ex) {
+            throw new DatabaseSaveException("Failed to save new user: " + ex.getMessage());
+        }
+    }
 
-        Member newMember = new Member(newMemberRequest.getUsername(),
-                newMemberRequest.getFirstName(),
-                newMemberRequest.getLastName(),
-                passwordEncoder.encode(newMemberRequest.getPassword()),
-                newMemberRequest.getEmail(),
-                newMemberRequest.getBirthdate(),
-                null,
-                newMemberMonogram,
-                null,
-                null
-        );
-
-        MemberRole memberRole = roleRepository.findByRole(Role.ROLE_USER).orElseThrow();
-        newMember.addRole(memberRole);
-
-        memberRepository.save(newMember);
+    private void addUserRoleToMember(Member member) {
+        MemberRole memberRole = memberRoleRepository.findByRole(Role.ROLE_USER).orElseThrow(() -> new IllegalStateException("Role cannot be found"));
+        member.addRole(memberRole);
     }
 }

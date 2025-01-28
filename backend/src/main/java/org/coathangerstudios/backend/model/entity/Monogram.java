@@ -1,9 +1,6 @@
 package org.coathangerstudios.backend.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -22,6 +19,8 @@ public class Monogram {
     private UUID monogramPublicId;
     private String characters;
     private String colorCode;
+    @OneToOne(mappedBy = "monogram", cascade = CascadeType.ALL)
+    private Member member;
 
     public Monogram(String characters, String colorCode) {
         this.characters = characters;
