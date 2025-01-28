@@ -6,4 +6,9 @@ import lombok.Data;
 public class MemberLoginRequest {
     private String usernameOrEmail;
     private String password;
+
+    public MemberLoginRequest(String usernameOrEmail, String password) {
+        this.usernameOrEmail = usernameOrEmail;
+        this.password = password;
+    }
 }

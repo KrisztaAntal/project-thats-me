@@ -1,11 +1,14 @@
 package org.coathangerstudios.backend.serviceTest;
 
 import org.coathangerstudios.backend.exception.DatabaseSaveException;
+import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
 import org.coathangerstudios.backend.model.entity.Member;
 import org.coathangerstudios.backend.model.entity.MemberRole;
 import org.coathangerstudios.backend.model.entity.Monogram;
 import org.coathangerstudios.backend.model.entity.Role;
+import org.coathangerstudios.backend.model.payload.JwtResponse;
+import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
 import org.coathangerstudios.backend.repository.MemberRepository;
 import org.coathangerstudios.backend.repository.MonogramRepository;
@@ -16,13 +19,20 @@ import org.coathangerstudios.backend.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class MemberServiceTest {
@@ -92,5 +102,46 @@ public class MemberServiceTest {
         verify(monogramRepositoryMock).save(any(Monogram.class));
         verify(memberRepositoryMock).save(any(Member.class));
         verify(memberRepositoryMock).findUserByUsername(newMemberRequest.getUsername());
+    }
+
+    @Test
+    public void testLogin_WrongPassword() {
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleRepositoryMock, monogramRepositoryMock, dtoMapperServiceMock);
+        MemberLoginRequest memberLoginRequest = new MemberLoginRequest("username", "123");
+
+        when(authenticationManagerMock.authenticate(new UsernamePasswordAuthenticationToken("username", "123"))).thenThrow(BadCredentialsException.class);
+
+        assertThrows(MemberNotFoundWithGivenCredentialsException.class, () -> memberService.login(memberLoginRequest));
+    }
+
+    @Test
+    public void testLogin_WrongUsernameOrEmail() {
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleRepositoryMock, monogramRepositoryMock, dtoMapperServiceMock);
+        MemberLoginRequest memberLoginRequest = new MemberLoginRequest("username", "123123123");
+
+        when(authenticationManagerMock.authenticate(new UsernamePasswordAuthenticationToken("username", "123123123"))).thenThrow(MemberNotFoundWithGivenCredentialsException.class);
+
+        assertThrows(MemberNotFoundWithGivenCredentialsException.class, () -> memberService.login(memberLoginRequest));
+    }
+
+    @Test
+    public void testLogin_Success() {
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleRepositoryMock, monogramRepositoryMock, dtoMapperServiceMock);
+        MemberLoginRequest memberLoginRequest = new MemberLoginRequest("testUser", "123123123");
+        Authentication authentication = mock(Authentication.class);
+        User userDetails = new User("testUser", "123123123", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        when(authenticationManagerMock.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(jwtUtilsMock.generateJwtToken(authentication)).thenReturn("mocked-JWT-token");
+
+        JwtResponse jwtResponse = memberService.login(memberLoginRequest);
+
+        assertEquals("mocked-JWT-token", jwtResponse.getToken());
+        assertEquals("testUser", jwtResponse.getUsername());
+        assertTrue(jwtResponse.getRoles().contains("ROLE_USER"));
+
+        verify(authenticationManagerMock).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(jwtUtilsMock).generateJwtToken(authentication);
     }
 }
