@@ -1,13 +1,16 @@
-package org.coathangerstudios.backend.model.dto;
+package org.coathangerstudios.backend.service;
 
+import org.coathangerstudios.backend.model.dto.*;
 import org.coathangerstudios.backend.model.entity.*;
+import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DTOMapper {
+@Service
+public class DTOMapperService {
 
-    public MemberDto toMemberDto(Member member){
+    public MemberDto toMemberDto(Member member) {
         return new MemberDto(
                 member.getMemberPublicId(),
                 member.getDateOfRegistry(),
@@ -35,7 +38,7 @@ public class DTOMapper {
         );
     }
 
-    public Set<ExpertiseDto> toExpertiseDtoSet(Set<Expertise> expertises){
+    public Set<ExpertiseDto> toExpertiseDtoSet(Set<Expertise> expertises) {
         return expertises.stream().map(this::toExpertiseDto).collect(Collectors.toSet());
     }
 
