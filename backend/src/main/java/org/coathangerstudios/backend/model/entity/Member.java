@@ -2,19 +2,24 @@ package org.coathangerstudios.backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
 @Getter
+@Setter
+@Entity
 public class Member {
 
     @Id
-    @GeneratedValue
-    private Long id;
-    private UUID memberId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long memberId;
+    @UuidGenerator
+    private UUID memberPublicId;
     private LocalDate dateOfRegistry;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -33,9 +38,10 @@ public class Member {
     private LocalDate birthDate;
     private String biography;
     @OneToOne
+    @JoinColumn(name="monogram_Id", referencedColumnName = "monogramId")
     private Monogram monogram;
     private String avatar;
-    private String bannerPic;
+    private String bannerImage;
 
     @ManyToMany
     private Set<Expertise> expertises;
@@ -44,4 +50,30 @@ public class Member {
     @ManyToMany
     private Set<ProjectOfMember> projectsOfMember;
 
+    public Member(String username, String firstName, String lastName, String password, String email, LocalDate birthDate, String biography, Monogram monogram, String avatar, String bannerImage) {
+        this.dateOfRegistry = LocalDate.now();
+        this.roles = new HashSet<>();
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
+        this.birthDate = birthDate;
+        this.biography = biography;
+        this.monogram = monogram;
+        this.avatar = avatar;
+        this.bannerImage = bannerImage;
+        this.expertises = new HashSet<>();
+        this.pastJobs = new HashSet<>();
+        this.projectsOfMember = new HashSet<>();
+    }
+
+    public Member() {
+    }
+
+    public void addRole(MemberRole role) {
+        roles.add(role);
+    }
 }
+
+
