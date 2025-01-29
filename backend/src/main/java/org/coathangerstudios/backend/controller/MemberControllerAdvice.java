@@ -1,5 +1,6 @@
 package org.coathangerstudios.backend.controller;
 
+import org.coathangerstudios.backend.exception.DatabaseSaveException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
 import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,13 @@ public class MemberControllerAdvice {
     @ExceptionHandler(MemberNotFoundWithGivenCredentialsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleEmailAddressNotFoundException(MemberNotFoundWithGivenCredentialsException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(DatabaseSaveException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleDatabaseSaveException(DatabaseSaveException e){
         return e.getMessage();
     }
 
