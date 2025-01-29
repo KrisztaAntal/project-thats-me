@@ -39,18 +39,18 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
-    private final MemberRoleRepository memberRoleRepository;
-    private final MonogramRepository monogramRepository;
+    private final MemberRoleService memberRoleService;
+    private final MonogramService monogramService;
     private final DTOMapperService dtoMapperService;
 
 
-    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleRepository memberRoleRepository, MonogramRepository monogramRepository, DTOMapperService dtoMapperService) {
+    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, MonogramService monogramService, DTOMapperService dtoMapperService) {
         this.authenticationManager = authenticationManager;
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
-        this.memberRoleRepository = memberRoleRepository;
-        this.monogramRepository = monogramRepository;
+        this.memberRoleService = memberRoleService;
+        this.monogramService = monogramService;
         this.dtoMapperService = dtoMapperService;
     }
 
@@ -89,18 +89,16 @@ public class MemberService {
 
     private void saveNewMember(NewMemberRequest newMemberRequest) {
         try {
-            Monogram monogramOfNewMember = new Monogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)), "#000000");
-            monogramRepository.save(monogramOfNewMember);
+            Monogram monogramOfNewMember = monogramService.saveMonogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)));
             Member newMember = new Member(newMemberRequest.getUsername(), newMemberRequest.getFirstName(), newMemberRequest.getLastName(), passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthdate(), null, monogramOfNewMember, null, null);
             addUserRoleToMember(newMember);
             memberRepository.save(newMember);
         } catch (DataAccessException ex) {
-            throw new DatabaseSaveException("Failed to save new user: " + ex.getMessage());
+            throw new DatabaseSaveException("Failed to save new user into the database");
         }
     }
 
     private void addUserRoleToMember(Member member) {
-        MemberRole memberRole = memberRoleRepository.findByRole(Role.ROLE_USER).orElseThrow(() -> new IllegalStateException("Role cannot be found"));
-        member.addRole(memberRole);
+        member.addRole(memberRoleService.getUserRole());
     }
 }
