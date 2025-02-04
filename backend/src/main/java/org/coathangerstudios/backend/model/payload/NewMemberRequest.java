@@ -25,15 +25,15 @@ public class NewMemberRequest {
     private String email;
     @Past
     @AgeLimit
-    private LocalDate birthdate;
+    private LocalDate birthDate;
 
-    public NewMemberRequest(String username, String firstName, String lastName, String password, String email, LocalDate birthdate) {
+    public NewMemberRequest(String username, String firstName, String lastName, String password, String email, LocalDate birthDate) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
-        this.birthdate = birthdate;
+        this.birthDate = birthDate;
     }
 
     public NewMemberRequest() {

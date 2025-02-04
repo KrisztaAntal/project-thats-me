@@ -5,15 +5,11 @@ import org.coathangerstudios.backend.exception.DatabaseSaveException;
 import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
 import org.coathangerstudios.backend.model.entity.Member;
-import org.coathangerstudios.backend.model.entity.MemberRole;
 import org.coathangerstudios.backend.model.entity.Monogram;
-import org.coathangerstudios.backend.model.entity.Role;
 import org.coathangerstudios.backend.model.payload.JwtResponse;
 import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
 import org.coathangerstudios.backend.repository.MemberRepository;
-import org.coathangerstudios.backend.repository.MonogramRepository;
-import org.coathangerstudios.backend.repository.MemberRoleRepository;
 import org.coathangerstudios.backend.security.jwt.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +86,7 @@ public class MemberService {
     private void saveNewMember(NewMemberRequest newMemberRequest) {
         try {
             Monogram monogramOfNewMember = monogramService.saveMonogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)));
-            Member newMember = new Member(newMemberRequest.getUsername(), newMemberRequest.getFirstName(), newMemberRequest.getLastName(), passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthdate(), null, monogramOfNewMember, null, null);
+            Member newMember = new Member(newMemberRequest.getUsername(), newMemberRequest.getFirstName(), newMemberRequest.getLastName(), passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthDate(), null, monogramOfNewMember, null, null);
             addUserRoleToMember(newMember);
             memberRepository.save(newMember);
         } catch (DataAccessException ex) {
