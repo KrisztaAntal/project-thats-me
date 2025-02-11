@@ -3,34 +3,30 @@ package org.coathangerstudios.backend.serviceTest;
 import org.coathangerstudios.backend.exception.DatabaseSaveException;
 import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
+import org.coathangerstudios.backend.model.entity.DefaultAvatar;
 import org.coathangerstudios.backend.model.entity.Member;
 import org.coathangerstudios.backend.model.entity.MemberRole;
-import org.coathangerstudios.backend.model.entity.Monogram;
 import org.coathangerstudios.backend.model.entity.Role;
 import org.coathangerstudios.backend.model.payload.JwtResponse;
 import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
 import org.coathangerstudios.backend.repository.MemberRepository;
-import org.coathangerstudios.backend.repository.MonogramRepository;
-import org.coathangerstudios.backend.repository.MemberRoleRepository;
 import org.coathangerstudios.backend.security.jwt.JwtUtils;
 import org.coathangerstudios.backend.service.DTOMapperService;
+import org.coathangerstudios.backend.service.DefaultAvatarService;
 import org.coathangerstudios.backend.service.MemberRoleService;
 import org.coathangerstudios.backend.service.MemberService;
-import org.coathangerstudios.backend.service.MonogramService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +40,7 @@ public class MemberServiceTest {
     private PasswordEncoder passwordEncoderMock;
     private JwtUtils jwtUtilsMock;
     private MemberRoleService memberRoleServiceMock;
-    private MonogramService monogramServiceMock;
+    private DefaultAvatarService defaultAvatarServiceMock;
     private DTOMapperService dtoMapperServiceMock;
 
     @BeforeEach
@@ -54,31 +50,31 @@ public class MemberServiceTest {
         passwordEncoderMock = mock(PasswordEncoder.class);
         jwtUtilsMock = mock(JwtUtils.class);
         memberRoleServiceMock = mock(MemberRoleService.class);
-        monogramServiceMock = mock(MonogramService.class);
+        defaultAvatarServiceMock = mock(DefaultAvatarService.class);
         dtoMapperServiceMock = mock(DTOMapperService.class);
     }
 
     @Test
     public void testSignUp_MemberWithUsernameOrEmailAlreadyExists() {
-        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, monogramServiceMock, dtoMapperServiceMock);
-        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "firstName", "Lastname", "password", "email@example.com", LocalDate.parse("2001-11-11"));
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, defaultAvatarServiceMock, dtoMapperServiceMock);
+        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "password", "email@example.com", LocalDate.parse("2001-11-11"));
         when(memberRepositoryMock.existsByUsernameOrEmail(newMemberRequest.getUsername(), newMemberRequest.getEmail())).thenReturn(true);
 
         assertThrows(UsernameOrEmailAddressAlreadyInUseException.class, () -> memberService.signUp(newMemberRequest));
-        verifyNoInteractions(monogramServiceMock);
+        verifyNoInteractions(defaultAvatarServiceMock);
         verifyNoInteractions(memberRoleServiceMock);
         verify(memberRepositoryMock, never()).save(any(Member.class));
     }
 
     @Test
     public void testSignUp_SavingFails() {
-        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, monogramServiceMock, dtoMapperServiceMock);
-        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "firstName", "Lastname", "password", "email@example.com", LocalDate.parse("2001-11-11"));
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, defaultAvatarServiceMock, dtoMapperServiceMock);
+        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "password", "email@example.com", LocalDate.parse("2001-11-11"));
         MemberRole userRole = new MemberRole(1L, Role.ROLE_USER);
         when(memberRepositoryMock.existsByUsernameOrEmail(newMemberRequest.getUsername(), newMemberRequest.getEmail())).thenReturn(false);
         when(passwordEncoderMock.encode(newMemberRequest.getPassword())).thenReturn("$2a$10$AzhoXWmxaTrVM02m2NqM9..NHHQubT9JVFQLMQHXJasxLqFbgyKVC");
         when(memberRoleServiceMock.getUserRole()).thenReturn(userRole);
-        when(monogramServiceMock.saveMonogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)))).thenThrow(new DatabaseSaveException("Failed to save Monogram"));
+        when(defaultAvatarServiceMock.saveDefaultAvatar(newMemberRequest.getUsername().substring(0, 1))).thenThrow(new DatabaseSaveException("Failed to save Monogram"));
 
         DatabaseSaveException exception = assertThrows(DatabaseSaveException.class, () -> memberService.signUp(newMemberRequest));
 
@@ -88,13 +84,13 @@ public class MemberServiceTest {
 
     @Test
     public void testSignUp_Success() {
-        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, monogramServiceMock, dtoMapperServiceMock);
-        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "firstName", "lastName", "456456456", "email@example.com", LocalDate.parse("2001-11-11"));
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, defaultAvatarServiceMock, dtoMapperServiceMock);
+        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "456456456", "email@example.com", LocalDate.parse("2001-11-11"));
         MemberRole userRole = new MemberRole(1L, Role.ROLE_USER);
-        Monogram monogram = new Monogram("FL", "#000000");
-        Member savedMember = new Member("username", "firstName", "lastName", "$2a$10$AzhoXWmxaTrVM02m2NqM9..NHHQubT9JVFQLMQHXJasxLqFbgyKVC", "email@example.com", LocalDate.parse("2001-11-11"), "", monogram, "", "");
+        DefaultAvatar defaultAvatar = new DefaultAvatar("U", "#303d3f");
+        Member savedMember = new Member("username", "", "", "$2a$10$AzhoXWmxaTrVM02m2NqM9..NHHQubT9JVFQLMQHXJasxLqFbgyKVC", "email@example.com", LocalDate.parse("2001-11-11"), "", defaultAvatar, "", "");
 
-        when(monogramServiceMock.saveMonogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)))).thenReturn(monogram);
+        when(defaultAvatarServiceMock.saveDefaultAvatar(newMemberRequest.getUsername().substring(0, 1))).thenReturn(defaultAvatar);
         when(memberRepositoryMock.existsByUsernameOrEmail(newMemberRequest.getUsername(), newMemberRequest.getEmail())).thenReturn(false);
         when(passwordEncoderMock.encode(newMemberRequest.getPassword())).thenReturn("$2a$10$AzhoXWmxaTrVM02m2NqM9..NHHQubT9JVFQLMQHXJasxLqFbgyKVC");
         when(memberRoleServiceMock.getUserRole()).thenReturn(userRole);
@@ -108,7 +104,7 @@ public class MemberServiceTest {
 
     @Test
     public void testLogin_WrongPassword() {
-        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, monogramServiceMock, dtoMapperServiceMock);
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, defaultAvatarServiceMock, dtoMapperServiceMock);
         MemberLoginRequest memberLoginRequest = new MemberLoginRequest("username", "123");
 
         when(authenticationManagerMock.authenticate(new UsernamePasswordAuthenticationToken("username", "123"))).thenThrow(BadCredentialsException.class);
@@ -118,7 +114,7 @@ public class MemberServiceTest {
 
     @Test
     public void testLogin_WrongUsernameOrEmail() {
-        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, monogramServiceMock, dtoMapperServiceMock);
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, defaultAvatarServiceMock, dtoMapperServiceMock);
         MemberLoginRequest memberLoginRequest = new MemberLoginRequest("usernameOrEmail", "123123123");
 
         when(authenticationManagerMock.authenticate(new UsernamePasswordAuthenticationToken("usernameOrEmail", "123123123"))).thenThrow(MemberNotFoundWithGivenCredentialsException.class);
@@ -128,7 +124,7 @@ public class MemberServiceTest {
 
     @Test
     public void testLogin_Success() {
-        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, monogramServiceMock, dtoMapperServiceMock);
+        MemberService memberService = new MemberService(authenticationManagerMock, memberRepositoryMock, passwordEncoderMock, jwtUtilsMock, memberRoleServiceMock, defaultAvatarServiceMock, dtoMapperServiceMock);
         MemberLoginRequest memberLoginRequest = new MemberLoginRequest("testUser", "123123123");
         Authentication authentication = mock(Authentication.class);
         User userDetails = new User("testUser", "123123123", List.of(new SimpleGrantedAuthority("ROLE_USER")));
