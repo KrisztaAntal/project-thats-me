@@ -4,8 +4,8 @@ import jakarta.transaction.Transactional;
 import org.coathangerstudios.backend.exception.DatabaseSaveException;
 import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
+import org.coathangerstudios.backend.model.entity.DefaultAvatar;
 import org.coathangerstudios.backend.model.entity.Member;
-import org.coathangerstudios.backend.model.entity.Monogram;
 import org.coathangerstudios.backend.model.payload.JwtResponse;
 import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
@@ -36,17 +36,17 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final MemberRoleService memberRoleService;
-    private final MonogramService monogramService;
+    private final DefaultAvatarService defaultAvatarService;
     private final DTOMapperService dtoMapperService;
 
 
-    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, MonogramService monogramService, DTOMapperService dtoMapperService) {
+    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, DefaultAvatarService defaultAvatarService, DTOMapperService dtoMapperService) {
         this.authenticationManager = authenticationManager;
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.memberRoleService = memberRoleService;
-        this.monogramService = monogramService;
+        this.defaultAvatarService = defaultAvatarService;
         this.dtoMapperService = dtoMapperService;
     }
 
@@ -85,8 +85,8 @@ public class MemberService {
 
     private void saveNewMember(NewMemberRequest newMemberRequest) {
         try {
-            Monogram monogramOfNewMember = monogramService.saveMonogram(newMemberRequest.getFirstName().substring(0, 1).concat(newMemberRequest.getLastName().substring(0, 1)));
-            Member newMember = new Member(newMemberRequest.getUsername(), newMemberRequest.getFirstName(), newMemberRequest.getLastName(), passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthDate(), null, monogramOfNewMember, null, null);
+            DefaultAvatar defaultAvatarOfMember = defaultAvatarService.saveDefaultAvatar(newMemberRequest.getUsername().substring(0, 1));
+            Member newMember = new Member(newMemberRequest.getUsername(), "", "", passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthDate(), null, defaultAvatarOfMember, null, null);
             addUserRoleToMember(newMember);
             memberRepository.save(newMember);
         } catch (DataAccessException ex) {
