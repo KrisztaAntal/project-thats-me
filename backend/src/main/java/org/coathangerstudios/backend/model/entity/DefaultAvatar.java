@@ -7,26 +7,26 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
-@Getter
 @Setter
+@Getter
 @Entity
-public class Monogram {
+public class DefaultAvatar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long monogramId;
+    private Long defaultAvatarId;
     @UuidGenerator
-    private UUID monogramPublicId;
-    private String characters;
+    private UUID defaultAvatarPublicId;
+    private String firstCharacter;
     private String colorCode;
-    @OneToOne(mappedBy = "monogram", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "defaultAvatar", cascade = CascadeType.ALL)
     private Member member;
 
-    public Monogram(String characters, String colorCode) {
-        this.characters = characters;
+    public DefaultAvatar(String firstCharacter, String colorCode) {
+        this.firstCharacter = firstCharacter;
         this.colorCode = colorCode;
     }
 
-    public Monogram() {
+    public DefaultAvatar() {
     }
 }
