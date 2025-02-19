@@ -23,8 +23,6 @@ async function createNewMember(newMember: NewMember): Promise<string> {
 function SignupForm() {
   const [newMember, setNewMember] = useState<NewMember>({
     username: "",
-    firstName: "",
-    lastName: "",
     password: "",
     confirmPassword: "",
     email: "",
@@ -87,26 +85,6 @@ function SignupForm() {
         onChange={handleInputChange}
         placeholder="johnDoe"
         error={touchedFields.username && errorFields.username}>
-      </CustomFormField>
-      <CustomFormField
-        name="firstName"
-        inputId="firstName"
-        labelValue="First Name"
-        inputType="text"
-        inputValue={newMember.firstName}
-        onChange={handleInputChange}
-        placeholder="John"
-        error={touchedFields.firstName && errorFields.firstName}>
-      </CustomFormField>
-      <CustomFormField
-        name="lastName"
-        inputId="lastName"
-        labelValue="Last Name"
-        inputType="text"
-        inputValue={newMember.lastName}
-        onChange={handleInputChange}
-        placeholder="Doe"
-        error={touchedFields.lastName && errorFields.lastName}>
       </CustomFormField>
       <CustomFormField
         name="password"

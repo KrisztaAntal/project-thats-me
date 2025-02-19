@@ -1,12 +1,12 @@
 CREATE TYPE Role AS ENUM('ROLE_USER', 'ROLE_ADMIN');
 
-DROP TABLE IF EXISTS monogram CASCADE;
-CREATE TABLE monogram
+DROP TABLE IF EXISTS default_avatar CASCADE;
+CREATE TABLE default_avatar
 (
-    monogram_id        bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    characters         varchar(255),
+    default_avatar_id        bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    first_character         varchar(255),
     color_code         varchar(255),
-    monogram_public_id uuid
+    default_avatar_public_id uuid
 );
 
 DROP TABLE IF EXISTS member_role CASCADE;
@@ -39,8 +39,8 @@ CREATE TABLE member
     member_public_id uuid,
     password         varchar(255),
     username         varchar(255),
-    monogram_id      bigint UNIQUE,
-    CONSTRAINT fk_monogram FOREIGN KEY (monogram_id) REFERENCES monogram (monogram_id) ON DELETE CASCADE
+    default_avatar_id      bigint UNIQUE,
+    CONSTRAINT fk_default_avatar FOREIGN KEY (default_avatar_id) REFERENCES default_avatar (default_avatar_id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS expertise CASCADE;

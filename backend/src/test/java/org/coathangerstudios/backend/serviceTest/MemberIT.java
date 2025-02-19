@@ -1,6 +1,5 @@
 package org.coathangerstudios.backend.serviceTest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
@@ -8,7 +7,7 @@ import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
 import org.coathangerstudios.backend.repository.MemberRepository;
 import org.coathangerstudios.backend.repository.MemberRoleRepository;
-import org.coathangerstudios.backend.repository.MonogramRepository;
+import org.coathangerstudios.backend.repository.DefaultAvatarRepository;
 import org.coathangerstudios.backend.security.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ public class MemberIT {
     private MemberRoleRepository memberRoleRepository;
 
     @Autowired
-    private MonogramRepository monogramRepository;
+    private DefaultAvatarRepository monogramRepository;
 
     @BeforeEach
     public void setup() {
@@ -57,7 +56,7 @@ public class MemberIT {
 
     @Test
     public void testSignUp_Success() throws Exception {
-        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "firstName", "lastName", "456456456", "email@example.com", LocalDate.parse("2001-11-11"));
+        NewMemberRequest newMemberRequest = new NewMemberRequest("username", "456456456", "email@example.com", LocalDate.parse("2001-11-11"));
 
         mockMvc.perform(post("/api/signup")
                         .content(jacksonObjectMapper.writeValueAsString(newMemberRequest))
@@ -69,7 +68,7 @@ public class MemberIT {
 
     @Test
     public void testSignUp_FailedWithValidators() throws Exception {
-        NewMemberRequest newMemberRequest = new NewMemberRequest("username@", "firstName", "lastName", "4564", "emailexample.com", LocalDate.parse("2021-11-11"));
+        NewMemberRequest newMemberRequest = new NewMemberRequest("username@", "4564", "emailexample.com", LocalDate.parse("2021-11-11"));
 
         mockMvc.perform(post("/api/signup")
                         .content(jacksonObjectMapper.writeValueAsString(newMemberRequest))
@@ -80,13 +79,13 @@ public class MemberIT {
                 .andExpect(jsonPath("$.username").value("Username can only contain letters, digits, underscores (_), hyphens (-), periods (.), and plus signs (+)."))
                 .andExpect(jsonPath("$.email").value("Email address must be a valid email format"))
                 .andExpect(jsonPath("$.password").value("Password must be 8-20 characters long"))
-                .andExpect(jsonPath("$.birthdate").value("User must be at least 14 years old"))
+                .andExpect(jsonPath("$.birthDate").value("User must be at least 14 years old"))
                 .andDo(print());
     }
 
     @Test
     public void testSignUp_FailedBecauseUsernameIsAlreadyInDB() throws Exception {
-        NewMemberRequest newMemberRequest = new NewMemberRequest("ankriszt", "Kriszta", "Antal", "456456456456", "Kriszta12@gmail.com", LocalDate.parse("2004-12-10"));
+        NewMemberRequest newMemberRequest = new NewMemberRequest("ankriszt", "456456456456", "Kriszta12@gmail.com", LocalDate.parse("2004-12-10"));
 
         mockMvc.perform(post("/api/signup")
                         .content(jacksonObjectMapper.writeValueAsString(newMemberRequest))
@@ -100,7 +99,7 @@ public class MemberIT {
 
     @Test
     public void testSignUp_FailedBecauseEmailIsAlreadyInDB() throws Exception {
-        NewMemberRequest newMemberRequest = new NewMemberRequest("ankriszt12", "Kriszta", "Antal", "456456456456", "Kriszta@gmail.com", LocalDate.parse("2004-12-10"));
+        NewMemberRequest newMemberRequest = new NewMemberRequest("ankriszt12", "456456456456", "Kriszta@gmail.com", LocalDate.parse("2004-12-10"));
 
         mockMvc.perform(post("/api/signup")
                         .content(jacksonObjectMapper.writeValueAsString(newMemberRequest))
@@ -114,7 +113,7 @@ public class MemberIT {
 
     @Test
     public void testSignUp_FailedBecauseEmailAndUsernameIsAlreadyInDB() throws Exception {
-        NewMemberRequest newMemberRequest = new NewMemberRequest("ankriszt", "Kriszta", "Antal", "456456456456", "Kriszta@gmail.com", LocalDate.parse("2004-12-10"));
+        NewMemberRequest newMemberRequest = new NewMemberRequest("ankriszt", "456456456456", "Kriszta@gmail.com", LocalDate.parse("2004-12-10"));
 
         mockMvc.perform(post("/api/signup")
                         .content(jacksonObjectMapper.writeValueAsString(newMemberRequest))

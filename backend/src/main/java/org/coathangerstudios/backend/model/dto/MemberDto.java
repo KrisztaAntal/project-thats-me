@@ -1,7 +1,5 @@
 package org.coathangerstudios.backend.model.dto;
 
-import org.coathangerstudios.backend.model.entity.ProjectOfMember;
-
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
@@ -15,7 +13,7 @@ public record MemberDto(UUID memberId,
                         String email,
                         LocalDate birthDate,
                         String biography,
-                        MonogramDto monogram,
+                        DefaultAvatarDto monogram,
                         String avatar,
                         String bannerPic,
                         Set<ExpertiseDto> expertises,

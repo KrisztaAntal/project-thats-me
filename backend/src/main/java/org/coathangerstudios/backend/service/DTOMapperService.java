@@ -21,7 +21,7 @@ public class DTOMapperService {
                 member.getEmail(),
                 member.getBirthDate(),
                 member.getBiography(),
-                toMonogramDto(member.getMonogram()),
+                toDefaultAvatarDto(member.getDefaultAvatar()),
                 member.getAvatar(),
                 member.getBannerImage(),
                 toExpertiseDtoSet(member.getExpertises()),
@@ -30,11 +30,11 @@ public class DTOMapperService {
         );
     }
 
-    public MonogramDto toMonogramDto(Monogram monogram) {
-        return new MonogramDto(
-                monogram.getMonogramPublicId(),
-                monogram.getCharacters(),
-                monogram.getColorCode()
+    public DefaultAvatarDto toDefaultAvatarDto(DefaultAvatar defaultAvatar) {
+        return new DefaultAvatarDto(
+                defaultAvatar.getDefaultAvatarPublicId(),
+                defaultAvatar.getFirstCharacter(),
+                defaultAvatar.getColorCode()
         );
     }
 
