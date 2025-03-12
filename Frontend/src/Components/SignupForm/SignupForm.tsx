@@ -34,13 +34,14 @@ function SignupForm() {
     const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
     const navigate = useNavigate();
 
+
     async function handleCreateMember(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const result = newMemberSchema.safeParse(newMember);
         if (result.success) {
             try {
                 await createNewMember(newMember);
-                navigate("/signin");
+                navigate("/login");
             } catch (error) {
                 alert('There has been a problem with your fetch operation: ' + (error instanceof Error ? error.message : ""));
             }
