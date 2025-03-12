@@ -29,3 +29,12 @@ export const newMemberSchema = z.object({
     message: "Passwords do not match.",
     path: ["confirmPassword"],
 });
+
+export const loginSchema = z.object({
+    usernameOrEmail: z.string()
+        .nonempty("Username or email is required."),
+    password: z.string()
+        .nonempty("Password cannot be blank.")
+        .min(8, "Password must be at least 8 characters long.")
+        .max(20, "Password must not exceed 20 characters.")
+})
