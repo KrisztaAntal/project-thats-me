@@ -1,8 +1,9 @@
-import {FormEvent, useEffect, useState} from "react";
+import {FormEvent, useState} from "react";
 import CustomFormField from "./CustomFormField";
 import {NewMember} from "../../Types/MemberTypes";
 import {useNavigate} from "react-router-dom";
 import {newMemberSchema} from "../../Schemas/MemberSchemas";
+import {useFormValidator} from "../useFormValidator.tsx";
 
 async function createNewMember(newMember: NewMember): Promise<string> {
     const response = await fetch('/api/signup', {
@@ -30,9 +31,11 @@ function SignupForm() {
     });
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
-    const [errorFields, setErrorFields] = useState<Record<string, string>>({});
     const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
     const navigate = useNavigate();
+
+    const errors = useFormValidator(newMemberSchema, newMember, touchedFields);
+
 
     async function handleCreateMember(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -40,7 +43,7 @@ function SignupForm() {
         if (result.success) {
             try {
                 await createNewMember(newMember);
-                navigate("/signin");
+                navigate("/login");
             } catch (error) {
                 alert('There has been a problem with your fetch operation: ' + (error instanceof Error ? error.message : ""));
             }
@@ -48,24 +51,6 @@ function SignupForm() {
             alert("Unexpected error occurred. Please try again later.");
         }
     }
-
-    useEffect(() => {
-        const validationProcess = setTimeout(() => {
-            const result = newMemberSchema.safeParse(newMember);
-            const errors: Record<string, string> = {};
-            if (!result.success) {
-                result.error.errors.forEach((err) => {
-                    const fieldName = err.path.length ? err.path[0] : "unknown";
-                    if (touchedFields[fieldName]) {
-                        errors[fieldName] = err.message;
-                    }
-                })
-            }
-            setErrorFields(prev => prev !== errors ? errors : prev);
-        }, 300)
-
-        return () => clearTimeout(validationProcess);
-    }, [newMember, touchedFields, navigate]);
 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const {name, value} = e.target;
@@ -84,7 +69,7 @@ function SignupForm() {
                 inputValue={newMember.username}
                 onChange={handleInputChange}
                 placeholder="johnDoe"
-                error={touchedFields.username && errorFields.username}>
+                error={touchedFields.username && errors.username}>
             </CustomFormField>
             <CustomFormField
                 name="password"
@@ -95,7 +80,7 @@ function SignupForm() {
                 onChange={handleInputChange}
                 placeholder="J0hnDoe@2025"
                 onShowPasswordClick={() => setShowPassword((prev) => !prev)}
-                error={touchedFields.password && errorFields.password}>
+                error={touchedFields.password && errors.password}>
             </CustomFormField>
             <CustomFormField
                 name="confirmPassword"
@@ -106,7 +91,7 @@ function SignupForm() {
                 onChange={handleInputChange}
                 placeholder="J0hnDoe@2025"
                 onShowPasswordClick={() => setShowConfirmPassword((prev) => !prev)}
-                error={touchedFields.confirmPassword && errorFields.confirmPassword}>
+                error={touchedFields.confirmPassword && errors.confirmPassword}>
             </CustomFormField>
             <CustomFormField
                 name="email"
@@ -116,7 +101,7 @@ function SignupForm() {
                 inputValue={newMember.email}
                 onChange={handleInputChange}
                 placeholder="johnDoe@gmail.com"
-                error={touchedFields.email && errorFields.email}>
+                error={touchedFields.email && errors.email}>
             </CustomFormField>
             <CustomFormField
                 name="birthDate"
@@ -125,7 +110,7 @@ function SignupForm() {
                 inputType="date"
                 inputValue={newMember.birthDate}
                 onChange={handleInputChange}
-                error={touchedFields.birthDate && errorFields.birthDate}>
+                error={touchedFields.birthDate && errors.birthDate}>
             </CustomFormField>
             <p className="text-white">Already have an account?
                 <button className="btn btn-link text-white px-2 pb-1 " onClick={() => navigate("/login")}>Log in</button></p>
