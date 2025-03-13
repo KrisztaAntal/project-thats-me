@@ -32,7 +32,8 @@ export const newMemberSchema = z.object({
 
 export const loginSchema = z.object({
     usernameOrEmail: z.string()
-        .nonempty("Username or email is required."),
+        .nonempty("Username or email is required.")
+        .regex(/^[\p{L}0-9_\-.+]+$/u, "Username can only contain letters, digits, underscores (_), hyphens (-), periods (.), and plus signs (+)."),
     password: z.string()
         .nonempty("Password cannot be blank.")
         .min(8, "Password must be at least 8 characters long.")

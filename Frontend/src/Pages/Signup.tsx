@@ -1,5 +1,5 @@
 import SignupForm from "../Components/SignupForm/SignupForm";
-import signupImage from "../assets/geometric_shape.svg";
+import signupImage from "../assets/signup_background.svg";
 
 
 function Signup() {
