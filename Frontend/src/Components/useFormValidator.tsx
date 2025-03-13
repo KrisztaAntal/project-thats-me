@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
 import {ZodSchema} from "zod";
 
-export function FormValidator<T>(schema: ZodSchema<T>,
-                                 data: T,
-                                 touchedFields: Record<string, boolean>,
-                                 debounceTime: number = 300
+export function useFormValidator<T>(schema: ZodSchema<T>,
+                                    data: T,
+                                    touchedFields: Record<string, boolean>,
+                                    debounceTime: number = 300
 ) {
     const [errors, setErrors] = useState<Record<string, string>>({});
 

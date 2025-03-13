@@ -3,6 +3,7 @@ import App from "./App";
 import Signup from "./Pages/Signup";
 import Layout from "./Layout.tsx";
 import Login from "./Pages/Login.tsx";
+import MainPage from "./Pages/MainPage.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -13,6 +14,10 @@ export const router = createBrowserRouter(
                 {
                     path: "default",
                     element: <App/>
+                },
+                {
+                    path:"main",
+                    element: <MainPage/>
                 }
             ]
         },
