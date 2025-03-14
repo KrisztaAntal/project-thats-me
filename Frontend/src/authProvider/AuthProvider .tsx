@@ -22,9 +22,13 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
         localStorage.setItem("token", jwtResponse.token);
     }
 
+    function logout(){
+        localStorage.removeItem("token");
+    }
+
 
     return (
-        <AuthContext.Provider value={{login}}>
+        <AuthContext.Provider value={{login, logout}}>
             {children}
         </AuthContext.Provider>
     )
