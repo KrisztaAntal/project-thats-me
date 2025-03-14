@@ -2,7 +2,6 @@ import CustomFormField from "./SignupForm/CustomFormField.tsx";
 import {FormEvent, useState} from "react";
 import {LoginCredentials} from "../Types/MemberTypes.ts";
 import {loginSchema} from "../Schemas/MemberSchemas.ts";
-import {useNavigate} from "react-router-dom";
 import {useFormValidator} from "./useFormValidator.tsx";
 import {useAuth} from "../authProvider/useAuth.tsx";
 
@@ -13,7 +12,6 @@ function LoginForm() {
     });
     const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
     const [showPassword, setShowPassword] = useState<boolean>(false);
-    const navigate = useNavigate();
     const errors = useFormValidator(loginSchema, loginCredentials, touchedFields);
     const {login} = useAuth();
 
@@ -23,7 +21,6 @@ function LoginForm() {
         if (result.success) {
             try {
                 await login(loginCredentials);
-                navigate("/main");
             } catch (error) {
                 alert('There has been a problem with your fetch operation: ' + (error instanceof Error ? error.message : ""));
             }

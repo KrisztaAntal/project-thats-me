@@ -51,9 +51,56 @@ export interface JwtResponse {
 export interface AuthContextType {
     login: (credentials: LoginCredentials) => Promise<void>;
     logout: () => void;
+    member: Member | null;
 }
 
+export interface Member {
+    memberPublicId: UUID;
+    dateOfRegistry: Date;
+    roles: string[];
+    username: string;
+    firstName?: string;
+    lastName?: string;
+    password: string;
+    email: string;
+    birthDate: Date;
+    expertise?: Expertise[];
+    projects?: ProjectOfMember[];
+    bio?: string;
+    pastJobs?: PastJob[];
+    defaultAvatar: DefaultAvatar;
+    avatar?: File;
+    bannerImage?: File;
+}
+
+export interface Expertise {
+    expertisePublicId: UUID;
+    name: string;
+}
+
+export interface ProjectOfMember {
+    projectPublicId: UUID;
+    projectTitle: string;
+    projectDescription: string;
+}
+
+export interface PastJob {
+    jobPublicId: UUID;
+    companyName: string;
+    jobTitle: string;
+    startDate: Date;
+    endDate: Date;
+    description: string;
+}
+
+export interface DefaultAvatar {
+    defaultAvatarPublicId: UUID;
+    firstCharacter: string;
+    colorCode: string;
+}
 
 export type NewMember = z.infer<typeof newMemberSchema>;
 
 export type LoginCredentials = z.infer<typeof loginSchema>;
+
+export type UUID = string & { readonly brand: unique symbol };
