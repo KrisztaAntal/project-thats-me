@@ -2,24 +2,8 @@ import CustomFormField from "./SignupForm/CustomFormField.tsx";
 import {FormEvent, useState} from "react";
 import {LoginCredentials} from "../Types/MemberTypes.ts";
 import {loginSchema} from "../Schemas/MemberSchemas.ts";
-import {useNavigate} from "react-router-dom";
 import {useFormValidator} from "./useFormValidator.tsx";
-
-async function login(loginCredentials: LoginCredentials): Promise<string> {
-    const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(loginCredentials),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.message);
-    }
-    return await response.json();
-}
+import {useAuth} from "../authProvider/useAuth.tsx";
 
 function LoginForm() {
     const [loginCredentials, setLoginCredentials] = useState<LoginCredentials>({
@@ -28,9 +12,8 @@ function LoginForm() {
     });
     const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
     const [showPassword, setShowPassword] = useState<boolean>(false);
-    const navigate = useNavigate();
     const errors = useFormValidator(loginSchema, loginCredentials, touchedFields);
-
+    const {login} = useAuth();
 
     async function handleLogin(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -38,7 +21,6 @@ function LoginForm() {
         if (result.success) {
             try {
                 await login(loginCredentials);
-                navigate("/main");
             } catch (error) {
                 alert('There has been a problem with your fetch operation: ' + (error instanceof Error ? error.message : ""));
             }
@@ -46,7 +28,6 @@ function LoginForm() {
             alert("Unexpected error occurred. Please try again later.");
         }
     }
-
 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const {name, value} = e.target;
