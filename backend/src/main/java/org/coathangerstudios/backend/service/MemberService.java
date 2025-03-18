@@ -9,6 +9,7 @@ import org.coathangerstudios.backend.model.entity.Member;
 import org.coathangerstudios.backend.model.payload.JwtResponse;
 import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
+import org.coathangerstudios.backend.model.payload.SuccessfulUploadResponse;
 import org.coathangerstudios.backend.repository.MemberRepository;
 import org.coathangerstudios.backend.security.jwt.JwtUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 import java.util.UUID;
@@ -38,6 +40,7 @@ public class MemberService {
     private final MemberRoleService memberRoleService;
     private final DefaultAvatarService defaultAvatarService;
     private final DTOMapperService dtoMapperService;
+    private final
 
 
     public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, DefaultAvatarService defaultAvatarService, DTOMapperService dtoMapperService) {
@@ -96,5 +99,10 @@ public class MemberService {
 
     private void addUserRoleToMember(Member member) {
         member.addRole(memberRoleService.getUserRole());
+    }
+
+    public SuccessfulUploadResponse updateAvatar(UUID memberPublicId, MultipartFile file) {
+
+        return null;
     }
 }
