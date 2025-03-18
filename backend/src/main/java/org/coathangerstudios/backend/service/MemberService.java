@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.coathangerstudios.backend.exception.DatabaseSaveException;
 import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
+import org.coathangerstudios.backend.model.dto.MemberDto;
 import org.coathangerstudios.backend.model.entity.DefaultAvatar;
 import org.coathangerstudios.backend.model.entity.Member;
 import org.coathangerstudios.backend.model.payload.JwtResponse;
@@ -40,7 +41,6 @@ public class MemberService {
     private final MemberRoleService memberRoleService;
     private final DefaultAvatarService defaultAvatarService;
     private final DTOMapperService dtoMapperService;
-    private final
 
 
     public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, DefaultAvatarService defaultAvatarService, DTOMapperService dtoMapperService) {
@@ -101,8 +101,12 @@ public class MemberService {
         member.addRole(memberRoleService.getUserRole());
     }
 
-    public SuccessfulUploadResponse updateAvatar(UUID memberPublicId, MultipartFile file) {
+    public MemberDto getMemberInfo(String username) {
+        Member member = memberRepository.findUserByUsername(username).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
+        return dtoMapperService.toMemberDto(member);
+    }
 
+    public SuccessfulUploadResponse updateAvatar(UUID memberPublicId, MultipartFile file) {
         return null;
     }
 }

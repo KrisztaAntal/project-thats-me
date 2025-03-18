@@ -1,6 +1,7 @@
 package org.coathangerstudios.backend.controller;
 
 import jakarta.validation.Valid;
+import org.coathangerstudios.backend.model.dto.MemberDto;
 import org.coathangerstudios.backend.model.payload.JwtResponse;
 import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
 import org.coathangerstudios.backend.model.payload.NewMemberRequest;
@@ -20,6 +21,11 @@ public class MemberController {
 
     public MemberController(MemberService memberService) {
         this.memberService = memberService;
+    }
+
+    @GetMapping("/member/me/{username}")
+    public MemberDto getMember(@PathVariable String username){
+        return memberService.getMemberInfo(username);
     }
 
     @PostMapping("/signup")
