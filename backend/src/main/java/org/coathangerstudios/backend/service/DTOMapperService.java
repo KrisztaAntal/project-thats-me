@@ -22,11 +22,20 @@ public class DTOMapperService {
                 member.getBirthDate(),
                 member.getBiography(),
                 toDefaultAvatarDto(member.getDefaultAvatar()),
-                member.getAvatar(),
-                member.getBannerImage(),
+                toImageDto(member.getAvatar()),
+                toImageDto(member.getBannerImage()),
                 toExpertiseDtoSet(member.getExpertises()),
                 toPastJobDtoSet(member.getPastJobs()),
                 toProjectOfMemberDtoSet(member.getProjectsOfMember())
+        );
+    }
+
+    public ImageDto toImageDto(Image image) {
+        return new ImageDto(
+                image.getImagePublicId(),
+                image.getName(),
+                image.getContentType(),
+                image.getImageData()
         );
     }
 

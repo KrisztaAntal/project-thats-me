@@ -88,7 +88,7 @@ public class MemberServiceTest {
         NewMemberRequest newMemberRequest = new NewMemberRequest("username", "456456456", "email@example.com", LocalDate.parse("2001-11-11"));
         MemberRole userRole = new MemberRole(1L, Role.ROLE_USER);
         DefaultAvatar defaultAvatar = new DefaultAvatar("U", "#303d3f");
-        Member savedMember = new Member("username", "", "", "$2a$10$AzhoXWmxaTrVM02m2NqM9..NHHQubT9JVFQLMQHXJasxLqFbgyKVC", "email@example.com", LocalDate.parse("2001-11-11"), "", defaultAvatar, "", "");
+        Member savedMember = new Member("username", "", "", "$2a$10$AzhoXWmxaTrVM02m2NqM9..NHHQubT9JVFQLMQHXJasxLqFbgyKVC", "email@example.com", LocalDate.parse("2001-11-11"), "", defaultAvatar, null, null);
 
         when(defaultAvatarServiceMock.saveDefaultAvatar(newMemberRequest.getUsername().substring(0, 1))).thenReturn(defaultAvatar);
         when(memberRepositoryMock.existsByUsernameOrEmail(newMemberRequest.getUsername(), newMemberRequest.getEmail())).thenReturn(false);
