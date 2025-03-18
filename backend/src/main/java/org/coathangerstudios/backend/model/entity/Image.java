@@ -12,7 +12,6 @@ import java.util.UUID;
 @Setter
 public class Image {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long imageId;
@@ -21,8 +20,18 @@ public class Image {
     private UUID imagePublicId;
 
     private String name;
+
     private String contentType;
+
     @Lob
     private byte[] imageData;
 
+    public Image(String name, String contentType, byte[] imageData) {
+        this.name = name;
+        this.contentType = contentType;
+        this.imageData = imageData;
+    }
+
+    public Image() {
+    }
 }
