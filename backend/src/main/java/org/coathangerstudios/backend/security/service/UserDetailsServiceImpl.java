@@ -39,8 +39,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private Member getMemberFromDatabase(String usernameOrEmail) {
         if (usernameOrEmail.contains("@")) {
-            return memberRepository.findUserByEmail(usernameOrEmail).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
+            return memberRepository.findMemberByEmail(usernameOrEmail).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
         }
-        return memberRepository.findUserByUsername(usernameOrEmail).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
+        return memberRepository.findMemberByUsername(usernameOrEmail).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
     }
 }

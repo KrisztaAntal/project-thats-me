@@ -41,14 +41,6 @@ public class Member {
     @JoinColumn(name="default_avatar_Id", referencedColumnName = "defaultAvatarId")
     private DefaultAvatar defaultAvatar;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "avatar_public_id", referencedColumnName = "imagePublicId")
-    private Image avatar;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "banner_image_public_id", referencedColumnName = "imagePublicId")
-    private Image bannerImage;
-
     @ManyToMany
     private Set<Expertise> expertises;
     @ManyToMany
@@ -56,7 +48,7 @@ public class Member {
     @ManyToMany
     private Set<ProjectOfMember> projectsOfMember;
 
-    public Member(String username, String firstName, String lastName, String password, String email, LocalDate birthDate, String biography, DefaultAvatar defaultAvatar, Image avatar, Image bannerImage) {
+    public Member(String username, String firstName, String lastName, String password, String email, LocalDate birthDate, String biography, DefaultAvatar defaultAvatar) {
         this.dateOfRegistry = LocalDate.now();
         this.roles = new HashSet<>();
         this.username = username;
@@ -67,8 +59,6 @@ public class Member {
         this.birthDate = birthDate;
         this.biography = biography;
         this.defaultAvatar = defaultAvatar;
-        this.avatar = avatar;
-        this.bannerImage = bannerImage;
         this.expertises = new HashSet<>();
         this.pastJobs = new HashSet<>();
         this.projectsOfMember = new HashSet<>();
