@@ -2,10 +2,13 @@ package org.coathangerstudios.backend.service;
 
 import jakarta.transaction.Transactional;
 import org.coathangerstudios.backend.exception.DatabaseSaveException;
+import org.coathangerstudios.backend.exception.MemberNotFoundException;
 import org.coathangerstudios.backend.exception.MemberNotFoundWithGivenCredentialsException;
 import org.coathangerstudios.backend.exception.UsernameOrEmailAddressAlreadyInUseException;
 import org.coathangerstudios.backend.model.dto.MemberDto;
 import org.coathangerstudios.backend.model.entity.DefaultAvatar;
+import org.coathangerstudios.backend.model.entity.Image;
+import org.coathangerstudios.backend.model.entity.ImageType;
 import org.coathangerstudios.backend.model.entity.Member;
 import org.coathangerstudios.backend.model.payload.JwtResponse;
 import org.coathangerstudios.backend.model.payload.MemberLoginRequest;
@@ -41,9 +44,10 @@ public class MemberService {
     private final MemberRoleService memberRoleService;
     private final DefaultAvatarService defaultAvatarService;
     private final DTOMapperService dtoMapperService;
+    private final ImageService imageService;
 
 
-    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, DefaultAvatarService defaultAvatarService, DTOMapperService dtoMapperService) {
+    public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, DefaultAvatarService defaultAvatarService, DTOMapperService dtoMapperService, ImageService imageService) {
         this.authenticationManager = authenticationManager;
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
@@ -51,13 +55,14 @@ public class MemberService {
         this.memberRoleService = memberRoleService;
         this.defaultAvatarService = defaultAvatarService;
         this.dtoMapperService = dtoMapperService;
+        this.imageService = imageService;
     }
 
     @Transactional
     public UUID signUp(NewMemberRequest newMemberRequest) {
         validateMemberUniqueness(newMemberRequest.getUsername(), newMemberRequest.getEmail());
         saveNewMember(newMemberRequest);
-        Member savedMember = memberRepository.findUserByUsername(newMemberRequest.getUsername()).orElseThrow(() -> new IllegalStateException("Member was not found after saving. This should not happen."));
+        Member savedMember = memberRepository.findMemberByUsername(newMemberRequest.getUsername()).orElseThrow(() -> new IllegalStateException("Member was not found after saving. This should not happen."));
         return savedMember.getMemberPublicId();
     }
 
@@ -89,7 +94,7 @@ public class MemberService {
     private void saveNewMember(NewMemberRequest newMemberRequest) {
         try {
             DefaultAvatar defaultAvatarOfMember = defaultAvatarService.saveDefaultAvatar(newMemberRequest.getUsername().substring(0, 1));
-            Member newMember = new Member(newMemberRequest.getUsername(), "", "", passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthDate(), null, defaultAvatarOfMember, null, null);
+            Member newMember = new Member(newMemberRequest.getUsername(), "", "", passwordEncoder.encode(newMemberRequest.getPassword()), newMemberRequest.getEmail(), newMemberRequest.getBirthDate(), null, defaultAvatarOfMember);
             addUserRoleToMember(newMember);
             memberRepository.save(newMember);
         } catch (DataAccessException ex) {
@@ -102,11 +107,17 @@ public class MemberService {
     }
 
     public MemberDto getMemberInfo(String username) {
-        Member member = memberRepository.findUserByUsername(username).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
+        Member member = memberRepository.findMemberByUsername(username).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
         return dtoMapperService.toMemberDto(member);
     }
 
     public SuccessfulUploadResponse updateAvatar(UUID memberPublicId, MultipartFile file) {
-        return null;
+        try {
+            Member member = memberRepository.findMemberByMemberPublicId(memberPublicId).orElseThrow(() -> new MemberNotFoundException("Could not find Member in database"));
+            Image savedImage = imageService.saveImage(file, member, ImageType.AVATAR);
+            return new SuccessfulUploadResponse("New avatar is saved", savedImage.getImagePublicId());
+        } catch (Exception e) {
+            throw new DatabaseSaveException("Unexpected error occurred while saving image into the database");
+        }
     }
 }
