@@ -49,6 +49,13 @@ public class MemberControllerAdvice {
     }
 
     @ResponseBody
+    @ExceptionHandler(UnUploadedFileException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleUnUploadedFileException(UnUploadedFileException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
     @ExceptionHandler(MemberNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleMemberNotFoundException(MemberNotFoundException e) {

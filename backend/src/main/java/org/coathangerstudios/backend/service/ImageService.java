@@ -2,10 +2,10 @@ package org.coathangerstudios.backend.service;
 
 import org.coathangerstudios.backend.exception.DatabaseSaveException;
 import org.coathangerstudios.backend.exception.FileReadException;
+import org.coathangerstudios.backend.exception.UnUploadedFileException;
 import org.coathangerstudios.backend.model.entity.Image;
 import org.coathangerstudios.backend.model.entity.ImageType;
 import org.coathangerstudios.backend.model.entity.Member;
-import org.coathangerstudios.backend.model.payload.SuccessfulUploadResponse;
 import org.coathangerstudios.backend.repository.ImageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,6 @@ import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,10 +33,13 @@ public class ImageService {
     }
 
     public Image saveImage(MultipartFile file, Member member, ImageType imageType) throws DatabaseSaveException {
+        if (file.isEmpty()) {
+            throw new UnUploadedFileException("Missing image, please upload an image.");
+        }
+        if (!ALLOWED_TYPES.contains(file.getContentType())) {
+            throw new UnsupportedMediaTypeException("Invalid file type. Only JPG, PNG, and PDF are allowed.");
+        }
         try {
-            if (!ALLOWED_TYPES.contains(file.getContentType())) {
-                throw new UnsupportedMediaTypeException("Invalid file type. Only JPG, PNG, and PDF are allowed.");
-            }
             Image image = new Image(
                     file.getOriginalFilename(),
                     file.getContentType(),
