@@ -45,6 +45,8 @@ public class MemberService {
     private final DefaultAvatarService defaultAvatarService;
     private final DTOMapperService dtoMapperService;
     private final ImageService imageService;
+    private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
+
 
 
     public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, DefaultAvatarService defaultAvatarService, DTOMapperService dtoMapperService, ImageService imageService) {
@@ -58,7 +60,6 @@ public class MemberService {
         this.imageService = imageService;
     }
 
-    @Transactional
     public UUID signUp(NewMemberRequest newMemberRequest) {
         validateMemberUniqueness(newMemberRequest.getUsername(), newMemberRequest.getEmail());
         saveNewMember(newMemberRequest);
@@ -114,9 +115,10 @@ public class MemberService {
     public SuccessfulUploadResponse updateAvatar(UUID memberPublicId, MultipartFile file) {
         try {
             Member member = memberRepository.findMemberByMemberPublicId(memberPublicId).orElseThrow(() -> new MemberNotFoundException("Could not find Member in database"));
-            Image savedImage = imageService.saveImage(file, member, ImageType.AVATAR);
-            return new SuccessfulUploadResponse("New avatar is saved", savedImage.getImagePublicId());
+            Image savedAvatar = imageService.updateAvatarImage(file, member);
+            return new SuccessfulUploadResponse("New avatar is saved", savedAvatar.getImagePublicId());
         } catch (Exception e) {
+            logger.error("{}",e.getMessage(),e);
             throw new DatabaseSaveException("Unexpected error occurred while saving image into the database");
         }
     }
