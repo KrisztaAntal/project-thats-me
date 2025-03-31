@@ -14,8 +14,6 @@ public record MemberDto(UUID memberId,
                         LocalDate birthDate,
                         String biography,
                         DefaultAvatarDto monogram,
-                        String avatar,
-                        String bannerPic,
                         Set<ExpertiseDto> expertises,
                         Set<PastJobDto> pastJobs,
                         Set<ProjectOfMemberDto> projectsOfMember

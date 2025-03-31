@@ -22,8 +22,6 @@ public class DTOMapperService {
                 member.getBirthDate(),
                 member.getBiography(),
                 toDefaultAvatarDto(member.getDefaultAvatar()),
-                member.getAvatar(),
-                member.getBannerImage(),
                 toExpertiseDtoSet(member.getExpertises()),
                 toPastJobDtoSet(member.getPastJobs()),
                 toProjectOfMemberDtoSet(member.getProjectsOfMember())

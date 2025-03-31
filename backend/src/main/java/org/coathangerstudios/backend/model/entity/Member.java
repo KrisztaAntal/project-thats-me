@@ -40,8 +40,6 @@ public class Member {
     @OneToOne
     @JoinColumn(name="default_avatar_Id", referencedColumnName = "defaultAvatarId")
     private DefaultAvatar defaultAvatar;
-    private String avatar;
-    private String bannerImage;
 
     @ManyToMany
     private Set<Expertise> expertises;
@@ -50,7 +48,7 @@ public class Member {
     @ManyToMany
     private Set<ProjectOfMember> projectsOfMember;
 
-    public Member(String username, String firstName, String lastName, String password, String email, LocalDate birthDate, String biography, DefaultAvatar defaultAvatar, String avatar, String bannerImage) {
+    public Member(String username, String firstName, String lastName, String password, String email, LocalDate birthDate, String biography, DefaultAvatar defaultAvatar) {
         this.dateOfRegistry = LocalDate.now();
         this.roles = new HashSet<>();
         this.username = username;
@@ -61,8 +59,6 @@ public class Member {
         this.birthDate = birthDate;
         this.biography = biography;
         this.defaultAvatar = defaultAvatar;
-        this.avatar = avatar;
-        this.bannerImage = bannerImage;
         this.expertises = new HashSet<>();
         this.pastJobs = new HashSet<>();
         this.projectsOfMember = new HashSet<>();
