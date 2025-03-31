@@ -75,5 +75,8 @@ public class ImageService {
         currentAvatar.removeImageType(ImageType.AVATAR);
     }
 
-
+    @Transactional
+    public Image selectAvatarOfMember(Member member){
+        return imageRepository.findByMemberAndImageTypesContaining(member, ImageType.AVATAR).orElseThrow(() -> new NoSuchElementException("Could not find current avatar"));
+    }
 }

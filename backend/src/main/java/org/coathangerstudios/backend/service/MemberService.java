@@ -112,9 +112,9 @@ public class MemberService {
         return dtoMapperService.toMemberDto(member);
     }
 
-    public SuccessfulUploadResponse updateAvatar(UUID memberPublicId, MultipartFile file) {
+    public SuccessfulUploadResponse updateAvatar(String username, MultipartFile file) {
         try {
-            Member member = memberRepository.findMemberByMemberPublicId(memberPublicId).orElseThrow(() -> new MemberNotFoundException("Could not find Member in database"));
+            Member member = memberRepository.findMemberByUsername(username).orElseThrow(() -> new MemberNotFoundException("Could not find Member in database"));
             Image savedAvatar = imageService.updateAvatarImage(file, member);
             return new SuccessfulUploadResponse("New avatar is saved", savedAvatar.getImagePublicId());
         } catch (Exception e) {
