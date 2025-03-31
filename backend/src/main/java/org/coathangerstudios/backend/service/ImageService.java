@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
@@ -61,4 +62,18 @@ public class ImageService {
             throw new DatabaseSaveException("Unexpected error occurred while saving image");
         }
     }
+
+    @Transactional
+    public Image updateAvatarImage(MultipartFile file, Member member) {
+        removeAvatarTagFromCurrentAvatar(member);
+        return saveImage(file, member, ImageType.AVATAR);
+    }
+
+    @Transactional
+    protected void removeAvatarTagFromCurrentAvatar(Member member) {
+        Image currentAvatar = imageRepository.findByMemberAndImageTypesContaining(member, ImageType.AVATAR).orElseThrow(() -> new NoSuchElementException("Could not find current avatar"));
+        currentAvatar.removeImageType(ImageType.AVATAR);
+    }
+
+
 }

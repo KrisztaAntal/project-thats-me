@@ -54,4 +54,8 @@ public class Image {
     public void addImageType(ImageType imageType) {
         imageTypes.add(imageType);
     }
+
+    public void removeImageType(ImageType imageType){
+        imageTypes.remove(imageType);
+    }
 }
