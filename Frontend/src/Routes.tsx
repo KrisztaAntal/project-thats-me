@@ -4,6 +4,7 @@ import Signup from "./Pages/Signup";
 import Layout from "./Layout.tsx";
 import Login from "./Pages/Login.tsx";
 import MainPage from "./Pages/MainPage.tsx";
+import MemberProfile from "./Pages/MemberProfile.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -18,6 +19,10 @@ export const router = createBrowserRouter(
                 {
                     path:"main",
                     element: <MainPage/>
+                },
+                {
+                    path:"profile",
+                    element:<MemberProfile/>
                 }
             ]
         },
