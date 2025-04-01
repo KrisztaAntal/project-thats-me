@@ -55,7 +55,7 @@ export interface AuthContextType {
 }
 
 export interface Member {
-    memberPublicId: UUID;
+    memberId: UUID;
     dateOfRegistry: Date;
     roles: string[];
     username: string;
@@ -68,9 +68,7 @@ export interface Member {
     projects?: ProjectOfMember[];
     bio?: string;
     pastJobs?: PastJob[];
-    defaultAvatar: DefaultAvatar;
-    avatar?: File;
-    bannerImage?: File;
+    monogram: DefaultAvatar;
 }
 
 export interface Expertise {
@@ -94,8 +92,8 @@ export interface PastJob {
 }
 
 export interface DefaultAvatar {
-    defaultAvatarPublicId: UUID;
-    firstCharacter: string;
+    monogramId: UUID;
+    characters: string;
     colorCode: string;
 }
 
