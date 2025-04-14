@@ -10,10 +10,10 @@ const getInitialState = () => {
 
 const AuthProvider = ({children}: { children: ReactNode }) => {
     const [member, setMember] = useState<Member | null>(getInitialState);
+    const [token] = useState(localStorage.getItem("token"))
 
 
     const getMember = async () => {
-        const token = localStorage.getItem("token");
         if (!token) return;
         try {
             const response = await fetch("/api/member/me", {
@@ -29,6 +29,7 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
             }
 
             const memberData: Member = await response.json();
+            localStorage.setItem("currentMember", JSON.stringify(memberData));
             setMember(memberData);
         } catch (error) {
             console.error("Error fetching user:", error);
@@ -72,7 +73,7 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
 
 
     return (
-        <AuthContext.Provider value={{login, logout, member}}>
+        <AuthContext.Provider value={{login, logout, member, token}}>
             {children}
         </AuthContext.Provider>
     )
