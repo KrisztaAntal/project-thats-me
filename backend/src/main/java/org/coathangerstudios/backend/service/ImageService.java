@@ -76,7 +76,7 @@ public class ImageService {
     }
 
     @Transactional
-    public Image selectAvatarOfMember(Member member){
-        return imageRepository.findByMemberAndImageTypesContaining(member, ImageType.AVATAR).orElseThrow(() -> new NoSuchElementException("Could not find current avatar"));
+    public Image selectImageOfMember(Member member, ImageType imageType){
+        return imageRepository.findByMemberAndImageTypesContaining(member, imageType).orElseThrow(() -> new NoSuchElementException("Could not find image"));
     }
 }
