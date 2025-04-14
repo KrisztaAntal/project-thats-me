@@ -10,7 +10,7 @@ const getInitialState = () => {
 
 const AuthProvider = ({children}: { children: ReactNode }) => {
     const [member, setMember] = useState<Member | null>(getInitialState);
-    const [token] = useState(localStorage.getItem("token"))
+    const [token, setToken] = useState(localStorage.getItem("token"))
 
 
     const getMember = async () => {
@@ -58,6 +58,7 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
             }
             const jwtResponse: JwtResponse = await response.json();
             localStorage.setItem("token", jwtResponse.token);
+            setToken(jwtResponse.token);
             await getMember();
         } catch (error) {
             console.error("Login error:", error);
