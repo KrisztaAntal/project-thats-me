@@ -48,7 +48,6 @@ public class MemberService {
     private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
 
 
-
     public MemberService(AuthenticationManager authenticationManager, MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, MemberRoleService memberRoleService, DefaultAvatarService defaultAvatarService, DTOMapperService dtoMapperService, ImageService imageService) {
         this.authenticationManager = authenticationManager;
         this.memberRepository = memberRepository;
@@ -118,8 +117,15 @@ public class MemberService {
             Image savedAvatar = imageService.updateAvatarImage(file, member);
             return new SuccessfulUploadResponse("New avatar is saved", savedAvatar.getImagePublicId());
         } catch (Exception e) {
-            logger.error("{}",e.getMessage(),e);
+            logger.error("{}", e.getMessage(), e);
             throw new DatabaseSaveException("Unexpected error occurred while saving image into the database");
         }
     }
+
+    @Transactional
+    public Image getImageOfMember(String username, ImageType imageType) {
+        Member member = memberRepository.findMemberByUsername(username).orElseThrow(MemberNotFoundWithGivenCredentialsException::new);
+        return imageService.selectImageOfMember(member, imageType);
+    }
+
 }

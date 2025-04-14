@@ -2,6 +2,7 @@ package org.coathangerstudios.backend.service;
 
 import org.coathangerstudios.backend.exception.DatabaseSaveException;
 import org.coathangerstudios.backend.exception.FileReadException;
+import org.coathangerstudios.backend.exception.NoSuchImageException;
 import org.coathangerstudios.backend.exception.UnUploadedFileException;
 import org.coathangerstudios.backend.model.entity.Image;
 import org.coathangerstudios.backend.model.entity.ImageType;
@@ -76,7 +77,7 @@ public class ImageService {
     }
 
     @Transactional
-    public Image selectAvatarOfMember(Member member){
-        return imageRepository.findByMemberAndImageTypesContaining(member, ImageType.AVATAR).orElseThrow(() -> new NoSuchElementException("Could not find current avatar"));
+    public Image selectImageOfMember(Member member, ImageType imageType){
+        return imageRepository.findByMemberAndImageTypesContaining(member, imageType).orElseThrow(NoSuchImageException::new);
     }
 }

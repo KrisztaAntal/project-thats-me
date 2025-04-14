@@ -4,6 +4,7 @@ import {LoginCredentials} from "../Types/MemberTypes.ts";
 import {loginSchema} from "../Schemas/MemberSchemas.ts";
 import {useFormValidator} from "./useFormValidator.tsx";
 import {useAuth} from "../authProvider/useAuth.tsx";
+import {useNavigate} from "react-router-dom";
 
 function LoginForm() {
     const [loginCredentials, setLoginCredentials] = useState<LoginCredentials>({
@@ -14,6 +15,7 @@ function LoginForm() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const errors = useFormValidator(loginSchema, loginCredentials, touchedFields);
     const {login} = useAuth();
+    const navigate = useNavigate();
 
     async function handleLogin(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -21,6 +23,7 @@ function LoginForm() {
         if (result.success) {
             try {
                 await login(loginCredentials);
+                navigate("/main");
             } catch (error) {
                 alert('There has been a problem with your fetch operation: ' + (error instanceof Error ? error.message : ""));
             }

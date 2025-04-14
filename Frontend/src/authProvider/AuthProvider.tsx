@@ -1,19 +1,22 @@
-import {createContext, ReactNode, useState} from "react";
+import {createContext, ReactNode, useEffect, useState} from "react";
 import {AuthContextType, JwtResponse, LoginCredentials, Member} from "../Types/MemberTypes.ts";
-import {useNavigate} from "react-router-dom";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
+const getInitialState = () => {
+    const currentMember = localStorage.getItem("currentMember");
+    return currentMember ? JSON.parse(currentMember) : null
+}
+
 const AuthProvider = ({children}: { children: ReactNode }) => {
-    const [member, setMember] = useState<Member | null>(null);
-    const navigate = useNavigate();
+    const [member, setMember] = useState<Member | null>(getInitialState);
+    const [token, setToken] = useState(localStorage.getItem("token"))
 
 
     const getMember = async () => {
-        const token = localStorage.getItem("token");
         if (!token) return;
         try {
-            const response = await fetch("/api/user/me", {
+            const response = await fetch("/api/member/me", {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -26,12 +29,17 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
             }
 
             const memberData: Member = await response.json();
+            localStorage.setItem("currentMember", JSON.stringify(memberData));
             setMember(memberData);
         } catch (error) {
             console.error("Error fetching user:", error);
             logout();
         }
     }
+
+    useEffect(() => {
+        localStorage.setItem("currentMember", JSON.stringify(member));
+    }, [member])
 
 
     const login = async (credentials: LoginCredentials) => {
@@ -50,8 +58,8 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
             }
             const jwtResponse: JwtResponse = await response.json();
             localStorage.setItem("token", jwtResponse.token);
+            setToken(jwtResponse.token);
             await getMember();
-            navigate("/main");
         } catch (error) {
             console.error("Login error:", error);
             alert(error instanceof Error ? error.message : "Something went wrong");
@@ -60,11 +68,13 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
 
     const logout = () => {
         localStorage.removeItem("token");
+        setMember(null);
+        localStorage.removeItem("currentMember");
     }
 
 
     return (
-        <AuthContext.Provider value={{login, logout, member}}>
+        <AuthContext.Provider value={{login, logout, member, token}}>
             {children}
         </AuthContext.Provider>
     )

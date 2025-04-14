@@ -42,6 +42,13 @@ public class MemberControllerAdvice {
     }
 
     @ResponseBody
+    @ExceptionHandler(NoSuchImageException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleNoSuchImageException(NoSuchImageException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
     @ExceptionHandler(UnsupportedMediaTypeException.class)
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     public String handleUnsupportedMediaTypeException(UnsupportedMediaTypeException e) {
