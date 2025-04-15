@@ -1,7 +1,8 @@
 <a id="readme-top"></a>
 
 # project-thats-me
-This is a platform for artists to share their projects with communities and businesses
+This is a platform for artists to share their portfolio with communities and businesses.
+A registered member can share their basic informations like email address and a short bio, their previous work experiences, and their list of hard/soft skills.
 
 
 <!-- TABLE OF CONTENTS -->
@@ -16,10 +17,21 @@ This is a platform for artists to share their projects with communities and busi
 </details>
 
 ## Main features
-- Signup
-- Login
-- Update your profile <sub>(in progress)<sub>
-- Upload your art projects <sub>(in progress)<sub>
+#### Signup
+  - a user can register only if they fill the signup form correctly, it is restricted on both the frontend and backend, so requests made via Postman are also restricted:
+      - username cannot contain special characters
+      - password must be 8-20 characters long
+      - only accepts valid email format
+      - user must be at least 14 years old
+        
+    ![ptm-signup-responsive](https://github.com/user-attachments/assets/6964a5fe-51f4-4199-a4f2-f16a17d6fc98)
+
+#### Login
+#### Member profile
+  - a logged in user can check their own and other members profiles as well changing the username in the url
+    
+#### Update your profile <sub>(in progress)<sub>
+#### Upload your art projects <sub>(in progress)<sub>
 
 ### Future plans
 - Social media platform to share your projects and artworks and get feedback instantly
