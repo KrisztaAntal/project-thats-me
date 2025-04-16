@@ -40,7 +40,7 @@ function LoginForm() {
     }
 
     return (
-        <form onSubmit={handleLogin}>
+        <form className="flex flex-col gap-4 items-center" onSubmit={handleLogin}>
             <CustomFormField name={"usernameOrEmail"} inputId={"usernameOrEmail"} labelValue={"Username or Email"}
                              inputType={"text"} inputValue={loginCredentials.usernameOrEmail}
                              onChange={handleInputChange} error={touchedFields.usernameOrEmail && errors.usernameOrEmail}/>
@@ -49,7 +49,7 @@ function LoginForm() {
                              inputValue={loginCredentials.password} onChange={handleInputChange}
                              onShowPasswordClick={() => setShowPassword((prev) => !prev)}
                              error={touchedFields.password && errors.password}/>
-            <button>Continue</button>
+            <button className="btn bg-[#9EF01A] p-2 hover:bg-accent active:bg-success mt-6 ">Continue</button>
         </form>
     )
 }
