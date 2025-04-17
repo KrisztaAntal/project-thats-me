@@ -27,6 +27,11 @@ A registered member can share their basic informations like email address and a 
     ![ptm-signup-responsive](https://github.com/user-attachments/assets/6964a5fe-51f4-4199-a4f2-f16a17d6fc98)
 
 #### Login
+- a registered user can login. A reminder error message is shown if someone does not fill the fields correctly.
+
+    ![ptm-loginp-lg 1](https://github.com/user-attachments/assets/a2f896c1-a1fb-49a1-bc30-af29a0d634ed)
+
+
 #### Member profile
   - a logged in user can check their own and other members profiles as well changing the username in the url
     
